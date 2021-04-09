@@ -5,10 +5,13 @@ services:
     image: postgres:13.2-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # - ./wait-for-postgres.sh:/usr/src/wait-for-postgres.sh
+    # working_dir: /usr/src/
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: gutentag
+    command: bash -c 'postgres; while PGPASSWORD='admin' psql -h 'db' -U 'admin' -c '\\q'; do sleep 1; done;'
 
   backend:
     build:
