@@ -19,11 +19,9 @@ const DocumentClassification = ({ data, dataPointId, nextData }) => {
   /*
   TODO: 
 
-  fixa document classification html/css
-  
   Labels gå fram och tillbaka (svår)
     
-  fixa så den skalar efter storlek
+  fixa så den skalar efter storlek 
   */
 
   useEffect(() => {
