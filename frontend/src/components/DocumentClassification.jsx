@@ -51,7 +51,7 @@ const DocumentClassification = ({ data, dataPointId, nextData }) => {
       <hr className="hr-title" data-content="Add new label" />
       <div className="form-container">
         <Form onSubmit={addLabel}>
-          <Form.Group controlId="form.name" className="form-group">
+          <Form.Group controlId="form.name">
             <input
               type="text"
               onChange={(event) => setLabel(event.target.value)}
@@ -60,7 +60,7 @@ const DocumentClassification = ({ data, dataPointId, nextData }) => {
               className="input-box"
               ref={inputRef}
             />
-            <button className="btn btn-primary label-btn" type="submit">
+            <button className="btn btn-primary" type="submit">
               Label
             </button>
           </Form.Group>
