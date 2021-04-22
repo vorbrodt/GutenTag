@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Button from 'react-bootstrap/esm/Button';
 import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
-import HTTPLauncher from '../services/HTTPLauncher';
+// import HTTPLauncher from '../services/HTTPLauncher';
 // import HTTPLauncher from '../services/HTTPLauncher';
 
 const Sequence = ({ data, dataPointId }) => {
   const [labelString, setLabelString] = useState('');
+  const [startIndex, setStartIndex] = useState('');
+  const [endIndex, setEndIndex] = useState('');
+  const [showAddLabel, setShowAddLabel] = useState(false);
+  const [keyPressed, setKeyPressed] = useState(false);
   const inputRef = useRef();
   const [count, setCount] = useState(0);
 
@@ -23,56 +26,84 @@ const Sequence = ({ data, dataPointId }) => {
   };
 
   useEffect(() => {
-    inputRef.current.value = '';
-    inputRef.current.focus();
-  }, [dataPointId]);
+    document.addEventListener('keydown', checkPressedKey);
+    document.addEventListener('keyup', keyDropped);
+  }, []);
 
-  useEffect(() => {
+  const handleToggleBtn = () => {
     console.log('now look at this', window.getSelection().toString());
     const markedText = window.getSelection();
-    const markedTextRange = markedText.getRangeAt(0);
-    const startIndex = markedTextRange.startOffset;
-    const endIndex = markedTextRange.endOffset - 1;
-    console.log('markedText: ', markedText);
-    console.log('markedTextRange: ', markedTextRange);
-    console.log('Start : ', startIndex, ' End: ', endIndex);
-  }, [count]);
+    if (markedText.anchorNode != null) {
+      console.log('in anchir');
+      if (markedText.anchorNode.parentNode.id === 'text-box-container') {
+        console.log('inhere');
+        const markedTextRange = markedText.getRangeAt(0); //!
+        setStartIndex(markedTextRange.startOffset); //!
+        setEndIndex(markedTextRange.endOffset - 1); //!
+        setShowAddLabel(!showAddLabel);
+      } else {
+        console.log('Wrong container');
+      }
+    } else {
+      console.log('please mark some text in the text box');
+    }
+  };
+  const checkPressedKey = (event) => {
+    setKeyPressed(true);
+    console.log('hej');
+    if (event.key === 's' && !keyPressed) {
+      handleToggleBtn();
+    }
+  };
+  const keyDropped = () => {
+    setKeyPressed(false);
+  };
 
   return (
     <div className="classification-container">
-      <div className="text-box-container">
-        <p>{data}</p>
-      </div>
       <hr className="hr-title" data-content="Suggestions" />
       <h4>Display label suggestions</h4>
-      <hr className="hr-title" data-content="Add new label" />
-      <button
-        className="btn btn-primary"
-        type="submit"
-        onClick={() => {
-          const tempCount = count + 1;
-          setCount(tempCount);
-        }}
-      >
-        Select
-      </button>
-      <div className="form-container">
-        <Form onSubmit={addLabel}>
-          <Form.Group controlId="form.name" className="form-group">
-            <input
-              type="text"
-              onChange={(event) => setLabelString(event.target.value)}
-              placeholder="Enter label..."
-              required
-              className="input-box"
-              ref={inputRef}
-            />
-            <button className="btn btn-primary label-btn" type="submit">
-              Label
-            </button>
-          </Form.Group>
-        </Form>
+      <hr className="hr-title" data-content="Text data" />
+      <div className="text-box-container">
+        <p id="text-box-container">{data}</p>
       </div>
+      <hr className="hr-title" data-content="Add new label" />
+      {showAddLabel ? (
+        <div className="form-container">
+          <Form onSubmit={addLabel}>
+            <Form.Group controlId="form.name" className="form-group">
+              <input
+                type="text"
+                onChange={(event) => setLabelString(event.target.value)}
+                placeholder="Enter label..."
+                required
+                className="input-box"
+                ref={inputRef}
+              />
+              <button
+                className="btn btn-primary label-btn"
+                type="submit"
+                onClick={() => {
+                  handleToggleBtn();
+                }}
+              >
+                Label
+              </button>
+            </Form.Group>
+          </Form>
+        </div>
+      ) : (
+        <button
+          className="btn btn-primary"
+          id="btn"
+          onClick={() => {
+            handleToggleBtn();
+          }}
+        >
+          Add new label (s)
+        </button>
+      )}
+
       <hr className="hr-title" data-content="Old labels" />
       <h4>Display old labels</h4>
     </div>
@@ -83,4 +114,5 @@ Sequence.propTypes = {
   data: PropTypes.string.isRequired,
   dataPointId: PropTypes.number.isRequired,
 };
+
 export default Sequence;
